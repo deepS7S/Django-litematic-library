@@ -1,0 +1,329 @@
+{% extends 'schematics/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #2a2a3b;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-title {
+        font-size: 1.8rem;
+        color: #ffaa44;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #4c6ef5;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #ffaa44;
+        font-size: 0.95rem;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="file"],
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #4a4a5a;
+        background: #1e1e2f;
+        color: #e0e0e0;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #4c6ef5;
+        box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.2);
+    }
+
+    .help-text {
+        font-size: 0.85rem;
+        color: #888;
+        margin-top: 0.25rem;
+    }
+
+    .current-file-info {
+        background: #1e1e2f;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        border-left: 3px solid #4c6ef5;
+    }
+
+    .current-file-info p {
+        margin: 0.25rem 0;
+        font-size: 0.9rem;
+    }
+
+    .file-name {
+        color: #ffaa44;
+        font-family: monospace;
+        word-break: break-all;
+    }
+
+    .file-size {
+        color: #4c6ef5;
+        font-weight: 500;
+    }
+
+    .checkbox-group {
+        background: #1e1e2f;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+        border: 1px solid #4a4a5a;
+    }
+
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        margin-bottom: 0;
+        color: #e0e0e0;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #dc3545;
+    }
+
+    .checkbox-group .checkbox-description {
+        font-size: 0.85rem;
+        color: #888;
+        margin-top: 0.5rem;
+        margin-left: 2rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #4a4a5a;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background: #4c6ef5;
+        color: white;
+        flex: 1;
+    }
+
+    .btn-primary:hover {
+        background: #3b5bdb;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 110, 245, 0.3);
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        flex: 1;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    .errorlist {
+        background: rgba(220, 53, 69, 0.1);
+        border-left: 3px solid #dc3545;
+        padding: 0.5rem 1rem;
+        margin-top: 0.5rem;
+        border-radius: 4px;
+        list-style: none;
+    }
+
+    .errorlist li {
+        color: #ff6b6b;
+        font-size: 0.85rem;
+    }
+
+    .image-preview {
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .image-preview img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        border: 2px solid #4a4a5a;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+
+    .badge-default {
+        background: #6c757d;
+        color: white;
+    }
+
+    .badge-custom {
+        background: #4c6ef5;
+        color: white;
+    }
+
+    hr {
+        border-color: #4a4a5a;
+        margin: 1rem 0;
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-title">
+        {% if title == 'Добавить схему' %}
+        ➕ {{ title }}
+        {% else %}
+        ✏️ {{ title }}
+        {% endif %}
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">
+                {{ field.label }}
+                {% if field.field.required %}
+                <span class="badge badge-default" style="background: #dc3545;">Обязательно</span>
+                {% endif %}
+            </label>
+
+            {% if field.name == 'clear_image' or field.name == 'clear_file' %}
+            <div class="checkbox-group">
+                <label>
+                    {{ field }}
+                    <span>{{ field.label }}</span>
+                </label>
+                {% if field.help_text %}
+                <div class="checkbox-description">{{ field.help_text }}</div>
+                {% endif %}
+            </div>
+            {% else %}
+            {{ field }}
+            {% if field.help_text %}
+            <div class="help-text">{{ field.help_text }}</div>
+            {% endif %}
+            {% endif %}
+
+            {% if field.errors %}
+            <ul class="errorlist">
+                {% for error in field.errors %}
+                <li>⚠️ {{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Превью текущего изображения (только для редактирования) -->
+        {% if form.instance and form.instance.image and form.instance.image.name %}
+        <div class="form-group">
+            <label>Текущее изображение</label>
+            <div class="image-preview">
+                {% if form.instance.image.name != 'default_images/default_schematic.png' %}
+                <img src="{{ form.instance.image.url }}" alt="{{ form.instance.name }}" id="current-image">
+                {% else %}
+                <div style="background: #1e1e2f; padding: 1rem; border-radius: 8px; text-align: center; color: #888;">
+                    📐 Установлено дефолтное изображение
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Информация о файле схемы -->
+        {% if form.instance and form.instance.file_litematica %}
+        <div class="form-group">
+            <label>Текущий файл схемы</label>
+            <div class="current-file-info">
+                <p>📄 <span class="file-name">{{ form.instance.file_litematica.name }}</span></p>
+                <p>📊 Размер: <span class="file-size">{{ form.instance.file_litematica.size|filesizeformat }}</span></p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                💾 Сохранить
+            </button>
+            <a href="{% url 'schematic_list' %}" class="btn btn-secondary">
+                ❌ Отмена
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Превью новой загружаемой картинки
+    document.addEventListener('DOMContentLoaded', function () {
+        const imageInput = document.querySelector('input[type="file"][name="image"]');
+        if (imageInput) {
+            imageInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        let preview = document.querySelector('#current-image');
+                        if (!preview) {
+                            // Создаем контейнер для превью если его нет
+                            const previewContainer = document.createElement('div');
+                            previewContainer.className = 'image-preview';
+                            previewContainer.innerHTML = '<img id="preview-image" style="max-width: 100%; max-height: 200px; border-radius: 8px;">';
+
+                            const parentGroup = imageInput.closest('.form-group');
+                            parentGroup.insertAdjacentElement('afterend', previewContainer);
+                            preview = document.querySelector('#preview-image');
+                        }
+                        preview.src = event.target.result;
+                        preview.alt = 'Новое изображение';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'schematics/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Все схемы</h2>
+<div class="grid">
+    {% for schematic in schematics %}
+    <div class="card">
+        {% if schematic.image %}
+            <img src="{{ schematic.image.url }}" alt="{{ schematic.name }}" class="card-img">
+        {% else %}
+            <img src="{% static 'schematics/images/default.png' %}" alt="Default" class="card-img">
+        {% endif %}
+        <div class="card-content">
+            <div class="card-title">{{ schematic.name }}</div>
+            <div class="card-author">Автор: {{ schematic.author.name }}</div>
+            <div class="card-description">{{ schematic.description|truncatechars:100 }}</div>
+            <div class="card-actions">
+                <a href="{% url 'schematic_detail' schematic.id %}" class="btn btn-sm">🔍 Просмотр</a>
+                <a href="{% url 'schematic_edit' schematic.id %}" class="btn btn-sm">✏️ Изменить</a>
+                <a href="{% url 'schematic_delete' schematic.id %}" class="btn btn-sm btn-danger">🗑️ Удалить</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>Пока нет ни одной схемы. <a href="{% url 'schematic_add' %}">Добавьте первую!</a></p>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">« Первая</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+    {% endif %}
+    <span class="current">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'schematics/base.html' %}
+
+{% block content %}
+<h2>Удаление схемы</h2>
+<p>Вы уверены, что хотите удалить схему <strong>"{{ object.name }}"</strong>?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Да, удалить</button>
+    <a href="{% url 'schematic_list' %}" class="btn">Отмена</a>
+</form>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'schematics/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    {% if schematic.image %}
+        <img src="{{ schematic.image.url }}" alt="{{ schematic.name }}" style="width:100%; max-height:400px; object-fit:cover;">
+    {% else %}
+        <img src="{% static 'schematics/images/default.png' %}" alt="Default" style="width:100%; max-height:400px; object-fit:cover;">
+    {% endif %}
+    <div class="card-content">
+        <h2>{{ schematic.name }}</h2>
+        <p><strong>Автор:</strong> {{ schematic.author.name }}</p>
+        <p><strong>Описание:</strong> {{ schematic.description }}</p>
+        <p><strong>Дата добавления:</strong> {{ schematic.created_at|date:"d.m.Y H:i" }}</p>
+        {% if schematic.file_litematica %}
+            <p><a href="{{ schematic.file_litematica.url }}" class="btn">📥 Скачать схему</a></p>
+        {% endif %}
+        <div class="card-actions">
+            <a href="{% url 'schematic_edit' schematic.id %}" class="btn">✏️ Редактировать</a>
+            <a href="{% url 'schematic_delete' schematic.id %}" class="btn btn-danger">🗑️ Удалить</a>
+            <a href="{% url 'schematic_list' %}" class="btn">← Назад</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

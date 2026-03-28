@@ -1,0 +1,45 @@
+{% extends 'schematics/base.html' %}
+
+{% block content %}
+<div class="stats">
+    <h2>👥 Все авторы</h2>
+    <p>Всего авторов: {{ authors.count }}</p>
+    <a href="{% url 'author_add' %}" class="btn" style="margin-top: 1rem;">➕ Добавить автора</a>
+    <a href="{% url 'schematic_list' %}" class="btn btn-outline" style="margin-top: 1rem;">← Назад к схемам</a>
+</div>
+
+<div class="grid">
+    {% for author in authors %}
+    <div class="card">
+        <div class="card-content">
+            <div class="card-title">👤 {{ author.name }}</div>
+            <div class="card-author">📊 Схем: {{ author.schematics.count }}</div>
+            <div class="card-actions">
+                <a href="{% url 'author_edit' author.id %}" class="btn btn-sm">✏️ Редактировать</a>
+                {% if author.schematics.count == 0 %}
+                <a href="{% url 'author_delete' author.id %}" class="btn btn-sm btn-danger">🗑️ Удалить</a>
+                {% else %}
+                <button class="btn btn-sm btn-danger" disabled style="opacity:0.5;" title="Нельзя удалить автора с существующими схемами">🗑️ Удалить</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>Пока нет ни одного автора. <a href="{% url 'author_add' %}">Добавьте первого!</a></p>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">« Первая</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+    {% endif %}
+    <span class="current">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
